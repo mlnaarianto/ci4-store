@@ -70,3 +70,7 @@ user_guide_src/cilexer/pycilexer.egg-info/*
 /build/
 /dist/
 /results/
+# =========================
+# Public uploads symlink
+# =========================
+/public/uploads

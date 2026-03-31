@@ -8,10 +8,9 @@ use CodeIgniter\Router\RouteCollection;
 
 $routes->get('/', 'Home::index');
 
-
 // ================= AUTH =================
 
-// Manual login
+// Login
 $routes->get('/login', 'Auth::login');
 $routes->post('/login', 'Auth::attemptLogin');
 
@@ -22,14 +21,80 @@ $routes->post('/register', 'Auth::storeRegister');
 // Logout
 $routes->get('/logout', 'Auth::logout');
 
-// 🔥 Google OAuth Login
+// Google OAuth
 $routes->get('/auth/google', 'Auth::google');
 $routes->get('/auth/google/callback', 'Auth::googleCallback');
 
+// Serve avatar
+$routes->get('avatar/(:segment)', 'Auth::serveAvatar/$1');
 
-// ================= PROTECTED AREA =================
 
-$routes->get('/orders', 'Orders::index', ['filter' => 'auth']);
+// =====================================================
+// ================= USER AREA (WAJIB LOGIN) ===========
+// =====================================================
+$routes->group('', ['filter' => 'auth'], function ($routes) {
 
-// Kalau nanti dashboard dipakai lagi:
-// $routes->get('/dashboard', 'Dashboard::index', ['filter' => 'auth']);
+    // Orders
+    $routes->get('/orders', 'Orders::index');
+
+    // ================= ACCOUNT SETTING =================
+    $routes->get('account/setting', 'SettingAccount::index');
+    $routes->post('account/setting/update', 'SettingAccount::update');
+
+    // ================= CONFIRM =================
+    $routes->group('confirm', function ($routes) {
+        $routes->get('/', 'Confirm::index');
+        $routes->post('store', 'Confirm::store');
+        $routes->post('update/(:num)', 'Confirm::update/$1');
+        $routes->post('delete/(:num)', 'Confirm::delete/$1');
+
+        // Proxy image secure
+        $routes->get('image/(:segment)/(:segment)', 'Confirm::image/$1/$2');
+    });
+
+    // ================= STORE =================
+    $routes->group('store', function ($routes) {
+
+        // PENTING: Route untuk image harus PERTAMA (sebelum route lain)
+        $routes->get('image/(:segment)/(:segment)', 'Store::image/$1/$2');
+        
+        // TAMBAHKAN: Route untuk refresh image (dengan cache busting)
+        $routes->get('refresh-image/(:segment)/(:segment)', 'Store::refreshImage/$1/$2');
+
+        // Baru setelah itu route CRUD biasa
+        $routes->get('/', 'Store::index');
+        $routes->get('create', 'Store::create');
+        $routes->post('store', 'Store::store');
+        $routes->get('edit/(:num)', 'Store::edit/$1');
+        $routes->post('update/(:num)', 'Store::update/$1');
+        $routes->get('delete/(:num)', 'Store::delete/$1'); // Optional
+
+    });
+});
+
+
+// =====================================================
+// ================= ADMIN AREA ========================
+// =====================================================
+
+$routes->group('admin', ['filter' => 'admin'], function ($routes) {
+
+    // Dashboard
+    $routes->get('dashboard', 'Dashboard::index');
+
+    // Produk
+    $routes->get('produk', 'AdminProduk::index');
+
+    // Users
+    $routes->get('users', 'AdminUsers::index');
+
+    // ================= CONFIRM APPROVAL =================
+    $routes->get('confirm', 'ApproveConfirm::index');
+    $routes->post('confirm/approve/(:num)', 'ApproveConfirm::approve/$1');
+    $routes->post('confirm/reject/(:num)', 'ApproveConfirm::reject/$1');
+
+    // ================= STATUS ACCOUNT =================
+    $routes->get('status', 'StatusAccount::index');
+    $routes->post('status/nonaktifkan/(:num)', 'StatusAccount::nonaktifkan/$1');
+    $routes->post('status/aktifkan/(:num)', 'StatusAccount::aktifkan/$1');
+});

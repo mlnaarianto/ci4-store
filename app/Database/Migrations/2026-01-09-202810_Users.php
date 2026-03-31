@@ -27,7 +27,7 @@ class Users extends Migration
             'password' => [
                 'type' => 'VARCHAR',
                 'constraint' => 255,
-                'null' => true, // NULL untuk login Google
+                'null' => true,
             ],
             'avatar' => [
                 'type' => 'VARCHAR',
@@ -37,13 +37,38 @@ class Users extends Migration
             'avatar_url' => [
                 'type' => 'VARCHAR',
                 'constraint' => 255,
-                'null' => true, // avatar dari Google
+                'null' => true,
             ],
             'google_id' => [
                 'type' => 'VARCHAR',
                 'constraint' => 100,
                 'null' => true,
             ],
+
+            'nomor_hp' => [
+                'type' => 'VARCHAR',
+                'constraint' => 20,
+                'null' => true,
+            ],
+
+            'alamat' => [
+                'type' => 'TEXT',
+                'null' => true,
+            ],
+
+            // ✅ ROLE ENUM
+            'role' => [
+                'type' => 'ENUM',
+                'constraint' => ['pembeli', 'penjual', 'admin'],
+                'default' => 'pembeli',
+            ],
+
+            'status' => [
+                'type' => 'ENUM',
+                'constraint' => ['aktif', 'nonaktif'],
+                'default' => 'aktif',
+            ],
+
             'token' => [
                 'type' => 'VARCHAR',
                 'constraint' => 255,

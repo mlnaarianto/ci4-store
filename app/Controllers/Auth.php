@@ -12,24 +12,20 @@ class Auth extends Controller
     public function login()
     {
         if (session()->get('logged_in')) {
-            return redirect()->to('/');
+            return $this->redirectByRole();
         }
 
-        return view('auth/login', [
-            'next' => $this->request->getGet('next')
-        ]);
+        return view('auth/login');
     }
 
     /* ================= REGISTER PAGE ================= */
     public function register()
     {
         if (session()->get('logged_in')) {
-            return redirect()->to('/');
+            return $this->redirectByRole();
         }
 
-        return view('auth/register', [
-            'next' => $this->request->getGet('next')
-        ]);
+        return view('auth/register');
     }
 
     /* ================= REGISTER PROCESS ================= */
@@ -37,22 +33,18 @@ class Auth extends Controller
     {
         $userModel = new User();
 
-        $data = [
+        $userModel->save([
             'name'     => $this->request->getPost('name'),
             'email'    => $this->request->getPost('email'),
-            'password' => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
-        ];
+            'password' => password_hash(
+                $this->request->getPost('password'),
+                PASSWORD_DEFAULT
+            ),
+            'role'     => 'pembeli',
+        ]);
 
-        $userModel->save($data);
-
-        $next = $this->request->getPost('next');
-        $message = 'Registrasi berhasil! Silakan login.';
-
-        if ($next && str_starts_with($next, '/')) {
-            return redirect()->to('/login?next=' . urlencode($next))->with('success', $message);
-        }
-
-        return redirect()->to('/login')->with('success', $message);
+        return redirect()->to('/login')
+            ->with('success', 'Registrasi berhasil! Silakan login.');
     }
 
     /* ================= LOGIN PROCESS ================= */
@@ -62,45 +54,29 @@ class Auth extends Controller
 
         $email    = $this->request->getPost('email');
         $password = $this->request->getPost('password');
-        $next     = $this->request->getPost('next');
 
-        $user = $userModel->getByEmail($email);
+        $user = $userModel->where('email', $email)->first();
 
-        // ❌ User tidak ada
         if (!$user) {
             return $this->loginError('Email tidak ditemukan.');
         }
 
-        // ❌ Akun Google tidak punya password
         if ($user['password'] === null) {
             return $this->loginError('Akun ini terdaftar via Google.');
         }
 
-        // ❌ Password salah
         if (!password_verify($password, $user['password'])) {
             return $this->loginError('Password salah.');
         }
 
-        // ✅ LOGIN SUKSES
-        session()->set([
-            'user_id'     => $user['id'],
-            'user_name'   => $user['name'],
-            'user_email'  => $user['email'],
-            'user_avatar' => $user['avatar_url'] ?? null,
-            'logged_in'   => true,
-        ]);
-
-        $redirectUrl = ($next && str_starts_with($next, '/')) ? $next : '/';
-
-        // Jika request dari AJAX (modal)
-        if ($this->request->isAJAX()) {
-            return $this->response->setJSON([
-                'status'   => 'success',
-                'redirect' => $redirectUrl
-            ]);
+        // 🔥 TAMBAHKAN INI
+        if (isset($user['status']) && $user['status'] === 'nonaktif') {
+            return $this->loginError('Akun anda sedang dinonaktifkan oleh admin.');
         }
 
-        return redirect()->to($redirectUrl);
+        $this->setUserSession($user);
+
+        return $this->redirectByRole();
     }
 
     /* ================= GOOGLE LOGIN ================= */
@@ -115,72 +91,180 @@ class Auth extends Controller
         $state = $this->request->getGet('state');
 
         if (!GoogleAuth::validateState($state)) {
-            return redirect()->to('/login')->with('error', 'Invalid OAuth state');
+            return redirect()->to('/login')
+                ->with('error', 'Invalid OAuth state');
         }
 
         try {
-            $googleUser = GoogleAuth::getUser($this->request->getGet('code'));
+
+            $googleUser = GoogleAuth::getUser(
+                $this->request->getGet('code')
+            );
 
             $userModel = new User();
-            $user = $userModel->where('email', $googleUser['email'])->first();
 
-            $tokenExpire = date('Y-m-d H:i:s', $googleUser['expires']);
+            $user = $userModel
+                ->where('email', $googleUser['email'])
+                ->first();
+
+            // 🔥 CEK STATUS JIKA USER SUDAH ADA
+            if ($user && isset($user['status']) && $user['status'] === 'nonaktif') {
+                return redirect()->to('/login')
+                    ->with('error', 'Akun anda sedang dinonaktifkan oleh admin.');
+            }
+
+            $localAvatar = $this->saveGoogleAvatar(
+                $googleUser['avatar'],
+                $googleUser['email']
+            );
+
+            $tokenExpire = date(
+                'Y-m-d H:i:s',
+                $googleUser['expires']
+            );
 
             if ($user) {
-                // Update user lama
+
+                // hapus avatar lama jika lokal
+                if (!empty($user['avatar_url']) && strpos($user['avatar_url'], 'uploads/') === 0) {
+
+                    $oldAvatar = WRITEPATH . $user['avatar_url'];
+
+                    if (file_exists($oldAvatar)) {
+                        @unlink($oldAvatar);
+                    }
+                }
+
                 $userModel->update($user['id'], [
                     'google_id'        => $googleUser['id'],
-                    'avatar_url'       => $googleUser['avatar'],
+                    'avatar_url'       => $localAvatar ?? $googleUser['avatar'],
                     'token'            => $googleUser['access_token'],
                     'token_expired_at' => $tokenExpire,
                 ]);
             } else {
-                // User baru Google
+
                 $userModel->save([
                     'name'             => $googleUser['name'],
                     'email'            => $googleUser['email'],
                     'google_id'        => $googleUser['id'],
-                    'avatar_url'       => $googleUser['avatar'],
+                    'avatar_url'       => $localAvatar ?? $googleUser['avatar'],
                     'password'         => null,
+                    'role'             => 'pembeli',
+                    'status'           => 'aktif', // pastikan default aktif
                     'token'            => $googleUser['access_token'],
                     'token_expired_at' => $tokenExpire,
                 ]);
 
-                $user = $userModel->where('email', $googleUser['email'])->first();
+                $user = $userModel
+                    ->where('email', $googleUser['email'])
+                    ->first();
             }
 
-            // 🔥 SET SESSION TERMASUK AVATAR
-            session()->set([
-                'user_id'     => $user['id'],
-                'user_name'   => $user['name'],
-                'user_email'  => $user['email'],
-                'user_avatar' => $googleUser['avatar'],
-                'logged_in'   => true,
-            ]);
+            $this->setUserSession($user);
 
-            return redirect()->to('/');
+            return $this->redirectByRole();
         } catch (\Exception $e) {
-            return redirect()->to('/login')->with('error', 'Login Google gagal.');
+
+            log_message('error', $e->getMessage());
+
+            return redirect()->to('/login')
+                ->with('error', 'Login Google gagal.');
         }
     }
+
+    /* ================= SET SESSION ================= */
+    private function setUserSession(array $user)
+    {
+        session()->set([
+            'user_id'     => $user['id'],
+            'user_name'   => $user['name'],
+            'user_email'  => $user['email'],
+            'user_avatar' => $user['avatar_url'] ?? null,
+            'role'   => $user['role'] ?? 'pembeli',
+            'logged_in'   => true,
+        ]);
+    }
+
+    /* ================= REDIRECT BY ROLE ================= */
+    private function redirectByRole()
+    {
+        if (session()->get('role') === 'admin') {
+            return redirect()->to('/admin/dashboard');
+        }
+
+        return redirect()->to('/');
+    }
+
+    /* ================= SAVE GOOGLE AVATAR ================= */
+    private function saveGoogleAvatar(string $avatarUrl, string $email): ?string
+    {
+        try {
+
+            $client = \Config\Services::curlrequest();
+            $response = $client->get($avatarUrl);
+
+            if ($response->getStatusCode() !== 200) {
+                return null;
+            }
+
+            $imageData = $response->getBody();
+
+            $fileName = 'avatar_' . md5($email . time()) . '.jpg';
+
+            $relativePath = 'uploads/avatars/' . $fileName;
+            $fullPath     = WRITEPATH . $relativePath;
+
+            // buat folder jika belum ada
+            if (!is_dir(dirname($fullPath))) {
+                mkdir(dirname($fullPath), 0777, true);
+            }
+
+            file_put_contents($fullPath, $imageData);
+
+            return $relativePath;
+        } catch (\Throwable $e) {
+            log_message('error', $e->getMessage());
+            return null;
+        }
+    }
+
+    /* ================= SERVE AVATAR ================= */
+public function serveAvatar($filename = null)
+{
+    if (!$filename) {
+        return $this->response->setStatusCode(404);
+    }
+
+    $filePath = WRITEPATH . 'uploads/avatars/' . basename($filename);
+
+    if (!file_exists($filePath)) {
+        return $this->response->setStatusCode(404);
+    }
+
+    $mimeType = mime_content_type($filePath);
+    $fileSize = filesize($filePath);
+
+    return $this->response
+        ->setHeader('Content-Type', $mimeType)
+        ->setHeader('Content-Length', $fileSize)
+        ->setHeader('Cache-Control', 'public, max-age=86400')
+        ->setHeader('Expires', gmdate("D, d M Y H:i:s", time() + 86400) . " GMT")
+        ->setBody(file_get_contents($filePath));
+}
 
     /* ================= LOGOUT ================= */
     public function logout()
     {
         session()->destroy();
-        return redirect()->to('/')->with('success', 'Anda telah logout.');
+        return redirect()->to('/')
+            ->with('success', 'Anda telah logout.');
     }
 
-    /* ================= HELPER ERROR ================= */
+    /* ================= ERROR HELPER ================= */
     private function loginError($message)
     {
-        if ($this->request->isAJAX()) {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => $message
-            ]);
-        }
-
-        return redirect()->back()->withInput()->with('error', $message);
+        return redirect()->back()
+            ->withInput()
+            ->with('error', $message);
     }
 }

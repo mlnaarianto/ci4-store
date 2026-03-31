@@ -6,101 +6,79 @@
 }">
     <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
 
-        <!-- Logo dan Kategori -->
+        <!-- Logo dan Kategori (Hanya untuk non-admin) -->
         <div class="flex items-center gap-4">
             <a href="/" class="text-xl font-bold text-green-600 whitespace-nowrap">
                 CI4-Toko
             </a>
 
-            <div class="relative" @click.outside="categoryOpen = false">
-                <button @click="categoryOpen = ! categoryOpen" class="text-slate-600 font-medium hover:text-green-600 flex items-center gap-1">
-                    Kategori
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                    </svg>
-                </button>
+            <?php if (session()->get('role') !== 'admin'): ?>
+                <div class="relative" @click.outside="categoryOpen = false">
+                    <button @click="categoryOpen = ! categoryOpen" class="text-slate-600 font-medium hover:text-green-600 flex items-center gap-1">
+                        Kategori
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
 
-                <!-- Mega Menu Kategori -->
-                <div x-show="categoryOpen"
-                    x-transition:enter="transition ease-out duration-200"
-                    x-transition:enter-start="opacity-0 transform scale-95"
-                    x-transition:enter-end="opacity-100 transform scale-100"
-                    x-transition:leave="transition ease-in duration-75"
-                    x-transition:leave-start="opacity-100 transform scale-100"
-                    x-transition:leave-end="opacity-0 transform scale-95"
-                    class="absolute left-0 mt-2 w-screen max-w-4xl bg-white rounded-lg shadow-xl overflow-hidden z-50"
-                    style="display: none;">
-                    <div class="p-4">
-                        <div class="grid grid-cols-4 gap-6">
-                            <!-- Kolom Kategori 1 -->
-                            <div>
-                                <h3 class="font-semibold text-gray-800 mb-3 text-sm">Elektronik</h3>
-                                <ul class="space-y-2">
-                                    <li><a href="/category/electronics" class="text-sm text-gray-600 hover:text-green-600">Handphone & Tablet</a></li>
-                                    <li><a href="/category/electronics" class="text-sm text-gray-600 hover:text-green-600">Laptop & Aksesoris</a></li>
-                                    <li><a href="/category/electronics" class="text-sm text-gray-600 hover:text-green-600">Komputer & Aksesoris</a></li>
-                                    <li><a href="/category/electronics" class="text-sm text-gray-600 hover:text-green-600">TV, Audio & Video</a></li>
-                                    <li><a href="/category/electronics" class="text-sm text-gray-600 hover:text-green-600">Home Entertainment</a></li>
-                                </ul>
-                            </div>
-                            <!-- Kolom Kategori 2 -->
-                            <div>
-                                <h3 class="font-semibold text-gray-800 mb-3 text-sm">Fashion Pria</h3>
-                                <ul class="space-y-2">
-                                    <li><a href="/category/mens-fashion" class="text-sm text-gray-600 hover:text-green-600">Atasan</a></li>
-                                    <li><a href="/category/mens-fashion" class="text-sm text-gray-600 hover:text-green-600">Bawahan</a></li>
-                                    <li><a href="/category/mens-fashion" class="text-sm text-gray-600 hover:text-green-600">Sepatu</a></li>
-                                    <li><a href="/category/mens-fashion" class="text-sm text-gray-600 hover:text-green-600">Tas</a></li>
-                                    <li><a href="/category/mens-fashion" class="text-sm text-gray-600 hover:text-green-600">Aksesoris</a></li>
-                                </ul>
-                            </div>
-                            <!-- Kolom Kategori 3 -->
-                            <div>
-                                <h3 class="font-semibold text-gray-800 mb-3 text-sm">Fashion Wanita</h3>
-                                <ul class="space-y-2">
-                                    <li><a href="/category/womens-fashion" class="text-sm text-gray-600 hover:text-green-600">Atasan</a></li>
-                                    <li><a href="/category/womens-fashion" class="text-sm text-gray-600 hover:text-green-600">Bawahan</a></li>
-                                    <li><a href="/category/womens-fashion" class="text-sm text-gray-600 hover:text-green-600">Dress</a></li>
-                                    <li><a href="/category/womens-fashion" class="text-sm text-gray-600 hover:text-green-600">Sepatu</a></li>
-                                    <li><a href="/category/womens-fashion" class="text-sm text-gray-600 hover:text-green-600">Tas</a></li>
-                                </ul>
-                            </div>
-                            <!-- Kolom Kategori 4 -->
-                            <div>
-                                <h3 class="font-semibold text-gray-800 mb-3 text-sm">Kesehatan & Kecantikan</h3>
-                                <ul class="space-y-2">
-                                    <li><a href="/category/health-beauty" class="text-sm text-gray-600 hover:text-green-600">Perawatan Kulit</a></li>
-                                    <li><a href="/category/health-beauty" class="text-sm text-gray-600 hover:text-green-600">Makeup</a></li>
-                                    <li><a href="/category/health-beauty" class="text-sm text-gray-600 hover:text-green-600">Perawatan Rambut</a></li>
-                                    <li><a href="/category/health-beauty" class="text-sm text-gray-600 hover:text-green-600">Perawatan Tubuh</a></li>
-                                    <li><a href="/category/health-beauty" class="text-sm text-gray-600 hover:text-green-600">Suplemen Kesehatan</a></li>
-                                </ul>
+                    <!-- Mega Menu Kategori -->
+                    <div x-show="categoryOpen"
+                        x-transition:enter="transition ease-out duration-200"
+                        x-transition:enter-start="opacity-0 transform scale-95"
+                        x-transition:enter-end="opacity-100 transform scale-100"
+                        x-transition:leave="transition ease-in duration-75"
+                        x-transition:leave-start="opacity-100 transform scale-100"
+                        x-transition:leave-end="opacity-0 transform scale-95"
+                        class="absolute left-0 mt-2 w-screen max-w-4xl bg-white rounded-lg shadow-xl overflow-hidden z-50"
+                        style="display: none;">
+                        <div class="p-4">
+                            <div class="grid grid-cols-4 gap-6">
+                                <!-- Kolom Kategori 1 -->
+                                <div>
+                                    <h3 class="font-semibold text-gray-800 mb-3 text-sm">Elektronik</h3>
+                                    <ul class="space-y-2">
+                                        <li><a href="/category/electronics" class="text-sm text-gray-600 hover:text-green-600">Handphone & Tablet</a></li>
+                                        <li><a href="/category/electronics" class="text-sm text-gray-600 hover:text-green-600">Laptop & Aksesoris</a></li>
+                                        <li><a href="/category/electronics" class="text-sm text-gray-600 hover:text-green-600">Komputer & Aksesoris</a></li>
+                                        <li><a href="/category/electronics" class="text-sm text-gray-600 hover:text-green-600">TV, Audio & Video</a></li>
+                                        <li><a href="/category/electronics" class="text-sm text-gray-600 hover:text-green-600">Home Entertainment</a></li>
+                                    </ul>
+                                </div>
+
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            <?php endif; ?>
         </div>
 
-        <!-- Search Bar (sesuai dengan versi lama) -->
-        <div class="flex-1 max-w-2xl px-6">
-            <form action="/" method="get">
-                <div class="relative">
-                    <input type="text" name="q" placeholder="Cari di CI4-Toko"
-                        class="w-full rounded-lg border px-4 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:outline-none">
-                    <button class="absolute right-3 top-2.5 text-slate-400 hover:text-green-600">
-                        🔍
-                    </button>
-                </div>
-            </form>
-        </div>
+        <!-- Search Bar (Hanya untuk non-admin) -->
+        <?php if (session()->get('role') !== 'admin'): ?>
+            <div class="flex-1 max-w-2xl px-6">
+                <form action="/" method="get">
+                    <div class="relative">
+                        <input type="text" name="q" placeholder="Cari di CI4-Toko"
+                            class="w-full rounded-lg border px-4 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:outline-none">
+                        <button class="absolute right-3 top-2.5 text-slate-400 hover:text-green-600">
+                            🔍
+                        </button>
+                    </div>
+                </form>
+            </div>
+        <?php else: ?>
+            <!-- Spacer untuk admin agar layout tetap rapi -->
+            <div class="flex-1"></div>
+        <?php endif; ?>
 
         <!-- Ikon Keranjang dan Menu Login/Profil -->
         <div class="flex items-center gap-4">
-            <a href="/cart" class="text-slate-600 hover:text-green-600 text-xl relative">
-                🛒
-                <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
-            </a>
+            <!-- Ikon Keranjang (Hanya untuk non-admin) -->
+            <?php if (session()->get('role') !== 'admin'): ?>
+                <a href="/cart" class="text-slate-600 hover:text-green-600 text-xl relative">
+                    🛒
+                    <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                </a>
+            <?php endif; ?>
 
             <?php if (! session()->get('logged_in')): ?>
                 <!-- Tombol untuk membuka Modal Login -->
@@ -119,7 +97,17 @@
 
                         <div class="w-8 h-8 rounded-full overflow-hidden bg-green-100 flex items-center justify-center">
                             <?php if ($avatar): ?>
-                                <img src="<?= esc($avatar) ?>" alt="avatar" class="w-full h-full object-cover">
+                                <?php
+                                // Check if avatar is a local file (starts with uploads/)
+                                if (strpos($avatar, 'uploads/') === 0):
+                                    // Create a URL to access the file through a controller
+                                    $avatarUrl = base_url('avatar/' . basename($avatar));
+                                else:
+                                    // It's an external URL (Google avatar)
+                                    $avatarUrl = $avatar;
+                                endif;
+                                ?>
+                                <img src="<?= esc($avatarUrl) ?>" alt="avatar" class="w-full h-full object-cover">
                             <?php else: ?>
                                 <span class="text-green-600 font-semibold text-sm">
                                     <?= strtoupper(substr(session()->get('user_name'), 0, 1)) ?>
@@ -143,25 +131,86 @@
                             <p class="text-sm font-medium"><?= session()->get('user_name') ?></p>
                             <p class="text-xs text-gray-500"><?= session()->get('user_email') ?></p>
                         </div>
-                        <a href="/" class="block px-4 py-2 text-sm hover:bg-slate-100">
+
+                        <!-- Menu Beranda (Hanya untuk non-admin) -->
+                        <?php if (session()->get('role') !== 'admin'): ?>
+                            <a href="/" class="block px-4 py-2 text-sm hover:bg-slate-100">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                </svg>
+                                Beranda
+                            </a>
+                        <?php endif; ?>
+
+                        <a href="<?= base_url('account/setting') ?>"
+                            class="block px-4 py-2 text-sm hover:bg-slate-100">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                            </svg>
-                            Beranda
-                        </a>
-                        <a href="/profile" class="block px-4 py-2 text-sm hover:bg-slate-100">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
                             Pengaturan Akun
                         </a>
-                        <a href="/orders" class="block px-4 py-2 text-sm hover:bg-slate-100">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                            </svg>
-                            Pesanan Saya
-                        </a>
+
+                        <!-- Menu Pesanan (Hanya untuk non-admin) -->
+                        <?php if (session()->get('role') !== 'admin'): ?>
+                            <a href="/orders" class="block px-4 py-2 text-sm hover:bg-slate-100">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                </svg>
+                                Pesanan Saya
+                            </a>
+                        <?php endif; ?>
+
+                        <?php if (session()->get('role') === 'penjual') : ?>
+
+                            <!-- MENU PENJUAL -->
+                            <a href="<?= base_url('store') ?>" class="block px-4 py-2 text-sm hover:bg-slate-100"> <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 7l1.664-2.496A2 2 0 016.328 4h11.344a2 2 0 011.664.504L21 7M5 7h14M5 7v12a2 2 0 002 2h10a2 2 0 002-2V7" />
+                                </svg>
+                                Kelola Toko
+                            </a>
+
+                        <?php elseif (session()->get('role') === 'pembeli') : ?>
+
+                            <!-- MENU PEMBELI -->
+                            <a href="/confirm" class="block px-4 py-2 text-sm hover:bg-slate-100 text-green-600 font-medium">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 4v16m8-8H4" />
+                                </svg>
+                                Buka Toko
+                            </a>
+
+                        <?php elseif (session()->get('role') === 'admin') : ?>
+
+                            <!-- MENU ADMIN -->
+                            <a href="/admin/confirm" class="block px-4 py-2 text-sm hover:bg-slate-100 text-red-600 font-medium">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 12h6m2 0a2 2 0 100-4 2 2 0 000 4zm0 0a2 2 0 110 4 2 2 0 010-4z" />
+                                </svg>
+                                Approval Toko
+                            </a>
+
+                            <!-- Tambahan menu untuk admin -->
+                            <a href="/admin/dashboard" class="block px-4 py-2 text-sm hover:bg-slate-100">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                </svg>
+                                Dashboard Admin
+                            </a>
+
+                            <a href="/admin/status" class="block px-4 py-2 text-sm hover:bg-slate-100">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                                </svg>
+                                Kelola Pengguna
+                            </a>
+
+                        <?php endif; ?>
                         <div class="border-t">
                             <a href="/logout" class="block px-4 py-2 text-sm text-red-500 hover:bg-slate-100">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">

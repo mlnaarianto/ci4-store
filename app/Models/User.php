@@ -16,6 +16,10 @@ class User extends Model
         'avatar',
         'avatar_url',
         'google_id',
+        'nomor_hp',
+        'alamat',
+        'role', // ✅ tambahkan ini
+        'status', // ✅ tambahkan ini
         'token',
         'token_expired_at'
     ];
