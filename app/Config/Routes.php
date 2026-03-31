@@ -57,7 +57,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
 
         // PENTING: Route untuk image harus PERTAMA (sebelum route lain)
         $routes->get('image/(:segment)/(:segment)', 'Store::image/$1/$2');
-        
+
         // TAMBAHKAN: Route untuk refresh image (dengan cache busting)
         $routes->get('refresh-image/(:segment)/(:segment)', 'Store::refreshImage/$1/$2');
 
@@ -97,4 +97,12 @@ $routes->group('admin', ['filter' => 'admin'], function ($routes) {
     $routes->get('status', 'StatusAccount::index');
     $routes->post('status/nonaktifkan/(:num)', 'StatusAccount::nonaktifkan/$1');
     $routes->post('status/aktifkan/(:num)', 'StatusAccount::aktifkan/$1');
+
+
+    // ================= STORE APPROVAL =================
+    $routes->get('stores', 'StatusStoreController::index');
+    $routes->get('stores/edit/(:num)', 'StatusStoreController::edit/$1');
+    $routes->post('stores/update/(:num)', 'StatusStoreController::update/$1');
+    $routes->get('stores/approve/(:num)', 'StatusStoreController::approve/$1');
+    $routes->post('stores/reject/(:num)', 'StatusStoreController::reject/$1');
 });

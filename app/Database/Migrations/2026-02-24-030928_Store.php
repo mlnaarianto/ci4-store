@@ -67,6 +67,11 @@ class Store extends Migration
                 'null' => true,
             ],
 
+            'alasan' => [
+                'type' => 'TEXT',
+                'null' => true,
+            ],
+
             'updated_at' => [
                 'type' => 'DATETIME',
                 'null' => true,

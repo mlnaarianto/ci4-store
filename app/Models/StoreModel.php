@@ -23,6 +23,7 @@ class StoreModel extends Model
         'deskripsi',
         'alamat',
         'status',
+        'alasan',
     ];
 
     /*

@@ -73,9 +73,11 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
 
-            <a href="/admin/produk"
-                class="flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-xl transition duration-300 shadow hover:shadow-lg">
-                📦 Kelola Produk
+            <a href="/admin/stores"
+                class="flex items-center justify-center gap-2 bg-purple-500 hover:bg-purple-600 text-white py-3 rounded-xl transition duration-300 shadow hover:shadow-lg">
+
+                🏪 Approval Toko
+
             </a>
 
             <a href="/admin/pesanan"

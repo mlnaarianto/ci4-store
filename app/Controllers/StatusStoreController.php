@@ -4,7 +4,6 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use App\Models\StoreModel;
-use CodeIgniter\HTTP\ResponseInterface;
 
 class StatusStoreController extends BaseController
 {
@@ -16,38 +15,28 @@ class StatusStoreController extends BaseController
     }
 
     /**
-     * Display list of stores for admin to manage status
+     * List semua toko (admin)
      */
     public function index()
     {
-        // Check if user is admin (you need to implement admin check)
-        // if (!session()->get('is_admin')) {
-        //     return redirect()->to('/')->with('error', 'Unauthorized access');
-        // }
-
         $stores = $this->storeModel
-            ->orderBy('created_at', 'DESC')
+            ->orderBy('created_at', 'ASC')
             ->findAll();
 
-        return view('admin/stores/index', [
+        return view('admin/StoreStatus/index', [
             'stores' => $stores
         ]);
     }
 
     /**
-     * Show form to edit store status
+     * Form edit status
      */
     public function edit($id)
     {
-        // Check if user is admin
-        // if (!session()->get('is_admin')) {
-        //     return redirect()->to('/')->with('error', 'Unauthorized access');
-        // }
-
         $store = $this->storeModel->find($id);
 
         if (!$store) {
-            return redirect()->back()->with('error', 'Store not found');
+            return redirect()->back()->with('error', 'Store tidak ditemukan');
         }
 
         return view('admin/stores/edit_status', [
@@ -56,16 +45,17 @@ class StatusStoreController extends BaseController
     }
 
     /**
-     * Update store status (pending -> aktif / ditolak)
+     * Update status (pending / aktif / ditolak)
      */
     public function update($id)
     {
-        // Check if user is admin
-        // if (!session()->get('is_admin')) {
-        //     return redirect()->to('/')->with('error', 'Unauthorized access');
-        // }
+        $store = $this->storeModel->find($id);
 
-        // Validation rules
+        if (!$store) {
+            return redirect()->back()->with('error', 'Store tidak ditemukan');
+        }
+
+        // Validasi dasar
         $rules = [
             'status' => 'required|in_list[pending,aktif,ditolak]'
         ];
@@ -76,130 +66,88 @@ class StatusStoreController extends BaseController
                 ->with('error', implode('<br>', $this->validator->getErrors()));
         }
 
-        // Find store
-        $store = $this->storeModel->find($id);
-        
-        if (!$store) {
-            return redirect()->back()->with('error', 'Store not found');
-        }
-
-        // Update status
         $newStatus = $this->request->getPost('status');
-        
-        // Optional: Add reason for rejection
+
         $data = [
             'status' => $newStatus,
             'updated_at' => date('Y-m-d H:i:s')
         ];
 
-        // If status is rejected, you might want to store rejection reason
+        // Kalau ditolak → wajib isi alasan
         if ($newStatus === 'ditolak') {
-            $rejectionReason = $this->request->getPost('rejection_reason');
-            // You might need to add a 'rejection_reason' column to your stores table
-            // $data['rejection_reason'] = $rejectionReason;
+            $alasan = $this->request->getPost('alasan');
+
+            if (empty($alasan)) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'Alasan penolakan wajib diisi');
+            }
+
+            $data['alasan'] = $alasan;
+        } else {
+            // selain ditolak → kosongkan alasan
+            $data['alasan'] = null;
         }
 
-        // Perform update
         if ($this->storeModel->update($id, $data)) {
-            $message = "Store status has been updated to " . ucfirst($newStatus);
-            
-            // You can send notification to store owner here
-            // $this->sendStatusNotification($store['user_id'], $newStatus, $rejectionReason ?? null);
-            
-            return redirect()->to('/admin/stores')->with('success', $message);
+            return redirect()->to('/admin/stores')
+                ->with('success', 'Status toko berhasil diperbarui');
         } else {
-            return redirect()->back()->with('error', 'Failed to update store status');
+            return redirect()->back()
+                ->with('error', 'Gagal update status toko');
         }
     }
 
     /**
-     * Quick approve store (set to aktif)
+     * Approve cepat
      */
     public function approve($id)
     {
-        // Check if user is admin
-        // if (!session()->get('is_admin')) {
-        //     return redirect()->to('/')->with('error', 'Unauthorized access');
-        // }
-
         $store = $this->storeModel->find($id);
-        
+
         if (!$store) {
-            return redirect()->back()->with('error', 'Store not found');
+            return redirect()->back()->with('error', 'Store tidak ditemukan');
         }
 
-        // Update to active
         $this->storeModel->update($id, [
             'status' => 'aktif',
+            'alasan' => null,
             'updated_at' => date('Y-m-d H:i:s')
         ]);
 
-        // You can send notification to store owner here
-        // $this->sendStatusNotification($store['user_id'], 'aktif');
-
-        return redirect()->to('/admin/stores')->with('success', 'Store has been approved and is now active');
+        return redirect()->to('/admin/stores')
+            ->with('success', 'Toko berhasil diaktifkan');
     }
 
     /**
-     * Quick reject store (set to ditolak)
+     * Reject cepat (butuh alasan)
      */
     public function reject($id)
     {
-        // Check if user is admin
-        // if (!session()->get('is_admin')) {
-        //     return redirect()->to('/')->with('error', 'Unauthorized access');
-        // }
-
         $store = $this->storeModel->find($id);
-        
+
         if (!$store) {
-            return redirect()->back()->with('error', 'Store not found');
+            return redirect()->back()->with('error', 'Store tidak ditemukan');
         }
 
-        // Validate rejection reason
+        // Validasi alasan
         $rules = [
-            'rejection_reason' => 'required|min_length[5]|max_length[500]'
+            'alasan' => 'required|min_length[5]|max_length[500]'
         ];
 
         if (!$this->validate($rules)) {
             return redirect()->back()
                 ->withInput()
-                ->with('error', 'Rejection reason is required');
+                ->with('error', 'Alasan penolakan wajib diisi (min 5 karakter)');
         }
 
-        // Update to rejected
         $this->storeModel->update($id, [
             'status' => 'ditolak',
-            // 'rejection_reason' => $this->request->getPost('rejection_reason'),
+            'alasan' => $this->request->getPost('alasan'),
             'updated_at' => date('Y-m-d H:i:s')
         ]);
 
-        // You can send notification to store owner here
-        // $this->sendStatusNotification($store['user_id'], 'ditolak', $this->request->getPost('rejection_reason'));
-
-        return redirect()->to('/admin/stores')->with('success', 'Store has been rejected');
-    }
-
-    /**
-     * Optional: Send notification to store owner
-     */
-    private function sendStatusNotification($userId, $status, $reason = null)
-    {
-        // You can implement email notification or in-app notification here
-        // For example:
-        // $userModel = new \App\Models\UserModel();
-        // $user = $userModel->find($userId);
-        
-        // $email = \Config\Services::email();
-        // $email->setTo($user['email']);
-        // $email->setSubject('Store Status Update');
-        
-        // $message = "Your store status has been updated to: " . ucfirst($status);
-        // if ($reason) {
-        //     $message .= "\nReason: " . $reason;
-        // }
-        
-        // $email->setMessage($message);
-        // $email->send();
+        return redirect()->to('/admin/stores')
+            ->with('success', 'Toko berhasil ditolak');
     }
 }

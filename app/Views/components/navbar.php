@@ -96,19 +96,30 @@
                         <?php $avatar = session()->get('user_avatar'); ?>
 
                         <div class="w-8 h-8 rounded-full overflow-hidden bg-green-100 flex items-center justify-center">
-                            <?php if ($avatar): ?>
-                                <?php
-                                // Check if avatar is a local file (starts with uploads/)
-                                if (strpos($avatar, 'uploads/') === 0):
-                                    // Create a URL to access the file through a controller
-                                    $avatarUrl = base_url('avatar/' . basename($avatar));
-                                else:
-                                    // It's an external URL (Google avatar)
-                                    $avatarUrl = $avatar;
-                                endif;
-                                ?>
-                                <img src="<?= esc($avatarUrl) ?>" alt="avatar" class="w-full h-full object-cover">
+                            <?php
+                            $avatar = session()->get('user_avatar');
+                            $avatarUrl = null;
+
+                            if (!empty($avatar) && strpos($avatar, 'uploads/') === 0) {
+                                // ✅ Avatar lokal (via controller)
+                                $avatarUrl = base_url('avatar/' . basename($avatar));
+                            }
+                            ?>
+
+                            <?php if ($avatarUrl): ?>
+                                <img
+                                    src="<?= esc($avatarUrl) ?>"
+                                    alt="avatar"
+                                    class="w-full h-full object-cover"
+                                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+
+                                <!-- fallback jika gambar gagal load -->
+                                <div class="hidden w-full h-full items-center justify-center text-green-600 font-semibold text-sm">
+                                    <?= strtoupper(substr(session()->get('user_name'), 0, 1)) ?>
+                                </div>
+
                             <?php else: ?>
+                                <!-- fallback jika tidak ada avatar -->
                                 <span class="text-green-600 font-semibold text-sm">
                                     <?= strtoupper(substr(session()->get('user_name'), 0, 1)) ?>
                                 </span>

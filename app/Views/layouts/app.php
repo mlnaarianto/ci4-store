@@ -14,6 +14,8 @@
 
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <link rel="icon" type="image/x-icon" href="<?= base_url('assets/favicon1.png') ?>">
 </head>
 
 <body class="bg-slate-100 text-slate-700 min-h-screen flex flex-col">
