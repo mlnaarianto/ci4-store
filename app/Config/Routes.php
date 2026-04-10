@@ -29,11 +29,12 @@ $routes->get('/auth/google/callback', 'Auth::googleCallback');
 $routes->get('avatar/(:segment)', 'Auth::serveAvatar/$1');
 
 
+
+
 // =====================================================
 // ================= USER AREA (WAJIB LOGIN) ===========
 // =====================================================
 $routes->group('', ['filter' => 'auth'], function ($routes) {
-
     // Orders
     $routes->get('/orders', 'Orders::index');
 
@@ -68,7 +69,13 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->get('edit/(:num)', 'Store::edit/$1');
         $routes->post('update/(:num)', 'Store::update/$1');
         $routes->get('delete/(:num)', 'Store::delete/$1'); // Optional
+    });
 
+     // ================= CHAT =================
+    $routes->group('chat', function ($routes) {
+        $routes->get('/', 'Chat::index');         // /chat
+        $routes->get('(:num)', 'Chat::detail/$1'); // /chat/1
+        $routes->post('send', 'Chat::send');      // /chat/send
     });
 });
 
@@ -78,6 +85,8 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
 // =====================================================
 
 $routes->group('admin', ['filter' => 'admin'], function ($routes) {
+
+ 
 
     // Dashboard
     $routes->get('dashboard', 'Dashboard::index');

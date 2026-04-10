@@ -151,6 +151,8 @@
                                 </svg>
                                 Beranda
                             </a>
+
+
                         <?php endif; ?>
 
                         <a href="<?= base_url('account/setting') ?>"
@@ -171,6 +173,16 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                                 </svg>
                                 Pesanan Saya
+                            </a>
+
+                            <a href="/chat" class="block px-4 py-2 text-sm hover:bg-slate-100">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    class="h-4 w-4 inline mr-2"
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 10h.01M12 10h.01M16 10h.01M9 16h6M21 12c0 4.418-4.03 8-9 8a9.77 9.77 0 01-4-.8L3 20l1.8-3.6A7.94 7.94 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                </svg>
+                                Chat
                             </a>
                         <?php endif; ?>
 
@@ -220,6 +232,9 @@
                                 </svg>
                                 Kelola Pengguna
                             </a>
+
+
+
 
                         <?php endif; ?>
                         <div class="border-t">
