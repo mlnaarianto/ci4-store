@@ -182,7 +182,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M8 10h.01M12 10h.01M16 10h.01M9 16h6M21 12c0 4.418-4.03 8-9 8a9.77 9.77 0 01-4-.8L3 20l1.8-3.6A7.94 7.94 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                                 </svg>
-                                Chat
+                                Chat Admin
                             </a>
                         <?php endif; ?>
 
@@ -225,6 +225,18 @@
                                 </svg>
                                 Dashboard Admin
                             </a>
+
+                            <a href="/admin/chat" class="block px-4 py-2 text-sm hover:bg-slate-100">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    class="h-4 w-4 inline mr-2"
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 10h.01M12 10h.01M16 10h.01M9 16h6M21 12c0 4.418-4.03 8-9 8a9.77 9.77 0 01-4-.8L3 20l1.8-3.6A7.94 7.94 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                </svg>
+                                Chat User
+                            </a>
+
+
 
                             <a href="/admin/status" class="block px-4 py-2 text-sm hover:bg-slate-100">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
