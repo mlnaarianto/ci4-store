@@ -101,42 +101,42 @@
 
                         <div class="mt-3 flex flex-col gap-2">
 
-    <!-- STATUS BADGE -->
-    <div class="flex gap-2">
-        <span class="px-3 py-1 text-xs rounded-full flex items-center gap-1
+                            <!-- STATUS BADGE -->
+                            <div class="flex gap-2">
+                                <span class="px-3 py-1 text-xs rounded-full flex items-center gap-1
             <?= $store['status'] == 'aktif'
                 ? 'bg-green-100 text-green-700 border border-green-200'
                 : ($store['status'] == 'ditolak'
                     ? 'bg-red-100 text-red-700 border border-red-200'
                     : 'bg-yellow-100 text-yellow-700 border border-yellow-200') ?>">
 
-            <span class="w-1.5 h-1.5 rounded-full 
+                                    <span class="w-1.5 h-1.5 rounded-full 
                 <?= $store['status'] == 'aktif'
                     ? 'bg-green-500'
                     : ($store['status'] == 'ditolak'
                         ? 'bg-red-500'
                         : 'bg-yellow-500') ?>">
-            </span>
+                                    </span>
 
-            <?= ucfirst($store['status']) ?>
-        </span>
+                                    <?= ucfirst($store['status']) ?>
+                                </span>
 
-        <?php if (!empty($store['updated_at'])): ?>
-            <span class="px-3 py-1 text-xs rounded-full bg-slate-100 text-slate-600">
-                Diperbarui: <?= date('d M Y', strtotime($store['updated_at'])) ?>
-            </span>
-        <?php endif; ?>
-    </div>
+                                <?php if (!empty($store['updated_at'])): ?>
+                                    <span class="px-3 py-1 text-xs rounded-full bg-slate-100 text-slate-600">
+                                        Diperbarui: <?= date('d M Y', strtotime($store['updated_at'])) ?>
+                                    </span>
+                                <?php endif; ?>
+                            </div>
 
-    <!-- ALASAN PENOLAKAN -->
-    <?php if ($store['status'] == 'ditolak' && !empty($store['alasan'])): ?>
-        <div class="bg-red-50 border border-red-200 text-red-700 p-3 rounded-lg text-sm">
-            <strong>Alasan penolakan:</strong><br>
-            <?= esc($store['alasan']) ?>
-        </div>
-    <?php endif; ?>
+                            <!-- ALASAN PENOLAKAN -->
+                            <?php if ($store['status'] == 'ditolak' && !empty($store['alasan'])): ?>
+                                <div class="bg-red-50 border border-red-200 text-red-700 p-3 rounded-lg text-sm">
+                                    <strong>Alasan penolakan:</strong><br>
+                                    <?= esc($store['alasan']) ?>
+                                </div>
+                            <?php endif; ?>
 
-</div>
+                        </div>
                     </div>
 
                 </div>
@@ -157,15 +157,51 @@
 
         <!-- ================= DESKRIPSI ================= -->
         <div class="bg-white rounded-2xl shadow p-6 mb-8">
-            <h2 class="text-lg font-semibold mb-3 flex items-center gap-2 text-slate-700">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path>
-                </svg>
-                Deskripsi Toko
-            </h2>
-            <p class="text-slate-600 text-sm leading-relaxed">
-                <?= esc($store['deskripsi'] ?? 'Belum ada deskripsi.') ?>
-            </p>
+
+            <?php
+            $role = session('role'); // ambil role user
+            $chatLabel = 'Chat Penjual'; // default untuk pembeli
+
+            if ($role === 'penjual') {
+                $chatLabel = 'Kotak Masuk';
+            }
+            ?>
+
+            <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
+
+                <!-- KIRI: DESKRIPSI -->
+                <div class="flex-1">
+                    <h2 class="text-lg font-semibold mb-3 flex items-center gap-2 text-slate-700">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path>
+                        </svg>
+                        Deskripsi Toko
+                    </h2>
+
+                    <p class="text-slate-600 text-sm leading-relaxed">
+                        <?= esc($store['deskripsi'] ?? 'Belum ada deskripsi.') ?>
+                    </p>
+                </div>
+
+                <!-- KANAN: BUTTON CHAT -->
+                <div class="flex-shrink-0">
+
+                    <a href="<?= base_url('chat/' . $store['id']) ?>"
+                        class="bg-green-600 hover:bg-green-700 text-white px-5 py-3 rounded-xl text-sm font-medium transition inline-flex items-center gap-2 shadow-md shadow-green-200">
+
+                        <!-- ICON CHAT -->
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.77 9.77 0 01-4-.8L3 20l1.2-3.2A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                        </svg>
+
+                        <?= $chatLabel ?>
+                    </a>
+
+                </div>
+
+            </div>
+
         </div>
 
 
@@ -204,7 +240,7 @@
                                     alt="<?= esc($product['nama_produk']) ?>"
                                     onerror="this.onerror=null; this.src='https://via.placeholder.com/300?text=Error';">
 
-                                <?php if ($product['stok'] <= 0): ?>
+                                <?php if ($product['stok_total'] <= 0): ?>
                                     <span class="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
                                         Habis
                                     </span>
@@ -218,24 +254,51 @@
 
                                 <div class="mt-2">
                                     <p class="text-red-600 font-bold text-sm">
-                                        Rp <?= number_format($product['harga'], 0, ',', '.') ?>
+                                        Rp <?= number_format($product['harga_min'], 0, ',', '.') ?>
+                                        - <?= number_format($product['harga_max'], 0, ',', '.') ?>
                                     </p>
                                 </div>
 
                                 <div class="flex justify-between items-center mt-3 text-xs text-slate-500">
+
                                     <span class="flex items-center gap-1">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                                         </svg>
-                                        Stok: <?= esc($product['stok']) ?>
+                                        Stok: <?= esc($product['stok_total']) ?>
                                     </span>
-                                    <a href="<?= base_url('product/edit/' . $product['id']) ?>"
-                                        class="text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
-                                        </svg>
-                                        Edit
-                                    </a>
+
+                                    <div class="flex items-center gap-2">
+
+                                        <!-- EDIT -->
+                                        <a href="<?= base_url('product/edit/' . $product['id']) ?>"
+                                            class="text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                                            </svg>
+                                            Edit
+                                        </a>
+
+                                        <!-- DELETE -->
+                                        <form action="<?= base_url('product/delete/' . $product['id']) ?>"
+                                            method="post"
+                                            onsubmit="return confirm('Yakin ingin menghapus produk ini?')">
+
+                                            <?= csrf_field() ?>
+
+                                            <button type="submit"
+                                                class="text-red-600 hover:text-red-800 hover:underline flex items-center gap-1">
+
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M10 3h4a1 1 0 011 1v2H9V4a1 1 0 011-1z"></path>
+                                                </svg>
+
+                                                Hapus
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
                         </div>

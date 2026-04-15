@@ -75,6 +75,15 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->group('chat', function ($routes) {
         $routes->get('/', 'Chat::index'); // /chat
     });
+
+    // ================= PRODUCT =================
+    $routes->group('product', function ($routes) {
+        $routes->get('create', 'Products::create');
+        $routes->post('store', 'Products::store');
+        $routes->get('edit/(:num)', 'Products::edit/$1');
+        $routes->post('update/(:num)', 'Products::update/$1');
+        $routes->post('delete/(:num)', 'Products::delete/$1');
+    });
 });
 
 
@@ -87,7 +96,7 @@ $routes->group('admin', ['filter' => 'admin'], function ($routes) {
     // 🔥 CHAT ADMIN
     $routes->get('chat', 'Chat::index');
     // $routes->get('chat/(:segment)', 'Chat::room/$1');
-    
+
 
 
 
